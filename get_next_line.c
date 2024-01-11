@@ -12,62 +12,103 @@
 
 #include "get_next_line.h"
 
-char	*readall(int fd, char *all)
+char	*file_line_appender(int fd, char *remaining)
 {
-	char	*nstr;
-	int		bytes_read;
+	int		read_bytes;
+	char		*buffer;
+	char		*temp;	
 
-	nstr = malloc((BUFFER_SIZE + 1) * sizeof(char));
-	if (!nstr)
+	buffer = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!buffer)
 		return (NULL);
-	bytes_read = 0;
-	while (ft_strchr(all, '\n') == 0 && bytes_read != 0)
+	read_bytes = 1;
+	while (read_bytes > 0 && !ft_strchr(remaining, '\n'))
 	{
-		bytes_read = read(fd, nstr, BUFFER_SIZE);
-		if (bytes_read == -1)
+		read_bytes = read(fd, buffer, BUFFER_SIZE);
+		if (read_bytes <= 0)
 		{
-			free(nstr);
-			return (NULL);
+			free(buffer);
+			if (read_bytes == 0)
+				return (remaining);
+			free(remaining);
+			return (0);
 		}
-		nstr[bytes_read] = '\0';
-		all = ft_strjoin(all, nstr);
+		buffer[read_bytes] = '\0';
+		temp = remaining;
+		remaining = ft_strjoin(remaining, buffer);
+		free(temp);
 	}
-	free(nstr);
-	return (all);
+	return (free(buffer), remaining);
+}
+
+char	*line_assigner(char *remaining)
+{
+	int		i;
+	char	*extracted_line;
+
+	i = 0;
+	while (remaining[i] && remaining[i] != '\n')
+		i++;
+	if (remaining[i] == '\n')
+		i++;
+	extracted_line = (char *)malloc(sizeof(char) * (i + 1));
+	if (!extracted_line)
+		return (NULL);
+	i = 0;
+	while (remaining[i] != '\n' && remaining[i])
+	{
+		extracted_line[i] = remaining[i];
+		i++;
+	}
+	if (remaining[i] == '\n')
+	{
+		extracted_line[i] = remaining[i];
+		i++;
+	}
+	extracted_line[i] = '\0';
+	return (extracted_line);
+}
+
+char	*buffer_cleaner(char *remaining)
+{
+	int		newline_i;
+	int		cleanup_j;
+	char		*cleaned;
+
+	newline_i = 0;
+	while (remaining[newline_i] && remaining[newline_i] != '\n')
+		newline_i++;
+	if (remaining[newline_i] == '\n')
+		newline_i++;
+	if (!remaining[newline_i] || !remaining)
+	{
+		free(remaining);
+		return (NULL);
+	}
+	cleaned = malloc(ft_strlen(remaining) - newline_i + 1);
+	if (!cleaned)
+	{
+		free(remaining);
+		return (NULL);
+	}
+	cleanup_j = 0;
+	while (remaining[newline_i])
+		cleaned[cleanup_j++] = remaining[newline_i++];
+	cleaned[cleanup_j] = '\0';
+	return (free(remaining), cleaned);
 }
 
 char	*get_next_line(int fd)
 {
-	char		*line;
-	static char	*leftover;
+	static char	*remaining;
+	char		*returnline;
 
-	if (fd < 0 && BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE < 1 || BUFFER_SIZE > INT_MAX)
 		return (0);
-	leftover = readall(fd, leftover);
-	if (!leftover)
+	remaining = file_line_appender(fd, remaining);
+	if (!remaining)
 		return (NULL);
-	line = gettheline(leftover);
-	leftover = remain(leftover);
-	return (line);
+	returnline = line_assigner(remaining);
+	remaining = buffer_cleaner(remaining);
+	return (returnline);
 }
-
-// int	main(void)
-// {
-// 	int		fd;
-// 	char	*next_line;
-// 	int		count;
-
-// 	count = 0;
-// 	fd = open("example.txt", O_RDONLY);
-// 	while (1)
-// 	{
-// 		next_line = get_next_line(fd);
-// 		if (next_line == NULL)
-// 			break ;
-// 		count++;
-// 		printf("[%d]:%s\n", count, next_line);
-// 		next_line = NULL;
-// 	}
-// 	close(fd);
-// 	return (0);
-// }
