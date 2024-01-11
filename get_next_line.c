@@ -12,7 +12,7 @@
 
 #include "get_next_line.h"
 
-char	*file_line_appender(int fd, char *remaining)
+char	*file_line_appender(int fd, char *remaining) //magnifying glass
 {
 	int		read_bytes;
 	char		*buffer;
@@ -41,7 +41,7 @@ char	*file_line_appender(int fd, char *remaining)
 	return (free(buffer), remaining);
 }
 
-char	*line_assigner(char *remaining)
+char	*line_assigner(char *remaining) //scissors
 {
 	int		i;
 	char	*extracted_line;
@@ -69,7 +69,7 @@ char	*line_assigner(char *remaining)
 	return (extracted_line);
 }
 
-char	*buffer_cleaner(char *remaining)
+char	*buffer_cleaner(char *remaining) //remaining --> temp storage for the words
 {
 	int		newline_i;
 	int		cleanup_j;
@@ -98,9 +98,9 @@ char	*buffer_cleaner(char *remaining)
 	return (free(remaining), cleaned);
 }
 
-char	*get_next_line(int fd)
+char	*get_next_line(int fd) //brain of the process, cordinates everything
 {
-	static char	*remaining;
+	static char	*remaining; //string serves as a temporary storage space for text between function calls.
 	char		*returnline;
 
 	if (fd < 0 || BUFFER_SIZE < 1 || BUFFER_SIZE > INT_MAX)
