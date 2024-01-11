@@ -23,8 +23,8 @@
 //utils
 char	*ft_strchr(const char *s, int c);
 char	*ft_strjoin(char const *s1, char const *s2);
-char	*gettheline(char *all);
-char	*remain(char *all);
+size_t	ft_strlen(const char *s);
+
 //main function
 char *get_next_line(int fd);
 # endif
