@@ -20,10 +20,11 @@
 # include <fcntl.h>
 # include <stdlib.h>
 
-char *get_next_line(int fd);
+//utils
 char	*ft_strchr(const char *s, int c);
 char	*ft_strjoin(char const *s1, char const *s2);
 char	*gettheline(char *all);
 char	*remain(char *all);
-char	*get_next_line(int fd);
+//main function
+char *get_next_line(int fd);
 # endif
